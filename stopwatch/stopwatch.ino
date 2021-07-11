@@ -263,7 +263,7 @@ void setup()
 }
 
 // Count will be displayed on the LED display
-int count = 0;
+long count = 0;
 
 // Angle of the servo
 int angle = 0;
@@ -281,7 +281,7 @@ void loop()
   int r[NUM_C] =
     {
      display.height()/2-1,
-     display.height()/4,
+     display.height()/4-1,
      display.height()/5,
     };
   
@@ -301,9 +301,9 @@ void loop()
   
   int s[NUM_C] =
     {
+     1800,
      180,
      18,
-     6,
     };
   
   int sw0, sw1;
@@ -317,7 +317,7 @@ void loop()
   Serial.println(line);
 
   // Display milliseconds
-  //  count = millis();
+  count = millis()/10;
   
   max7219_write_int(0, count, 1, 2);
 
