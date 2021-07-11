@@ -167,6 +167,7 @@ void max7219_write_int(int display, long int n, int lead_zero, int dp_pos)
   // Process sign 
   if ( number < 0 )
     {
+
       digitbuffer[7] = DIGIT_CHAR_DASH;
       n = -n;
     }
@@ -264,6 +265,7 @@ void setup()
 
 // Count will be displayed on the LED display
 long count = 0;
+long time_offset = 0;
 
 // Angle of the servo
 int angle = 0;
@@ -307,7 +309,9 @@ void loop()
     };
   
   int sw0, sw1;
-  int c;
+  int c;  // Display milliseconds
+  //  count = millis()*10;
+
   
   sw0 = digitalRead(SW0_PIN);
   sw1 = digitalRead(SW1_PIN);
@@ -316,29 +320,36 @@ void loop()
   
   Serial.println(line);
 
-  // Display milliseconds
-  count = millis()/10;
-  
-  max7219_write_int(0, count, 1, 2);
-
-  if( run )
-    {
-      count++;
-    }
+  long time = millis()/10;
+  long split;
   
   myservo.write(count/100);
 
   // Attend to switches
   if( (sw0 == 0) && (last_sw0 == 1) )
     {
-      count = 0;
+      time_offset = time;
+      //count = 0;
     }
 
+  count = time - time_offset;
+  
+  // Display milliseconds
+  //count = millis()*10;
+  
   if( (sw1 == 0) && (last_sw1 == 1) )
     {
+      split = time-time_offset;
       run = 1-run;
     }
 
+  if( !run )
+    {
+      count = split;
+    }
+
+  max7219_write_int(0, count, 1, 2);
+  
   last_sw1 = sw1;
   last_sw0 = sw0;
 
@@ -353,4 +364,5 @@ void loop()
       display.drawLine(ox[c], oy[c], x, y, SSD1306_WHITE);
     }
   display.display();
+
 }
